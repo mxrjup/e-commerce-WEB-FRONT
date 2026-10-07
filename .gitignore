@@ -1,0 +1,25 @@
+### Dependances ###
+node_modules/
+
+### Build ###
+dist/
+build/
+*.tsbuildinfo
+
+### Secrets et configuration locale ###
+.env
+.env.*
+!.env.example
+
+### Logs ###
+*.log
+npm-debug.log*
+
+### IDE ###
+.idea/
+.vscode/
+*.iml
+
+### OS ###
+.DS_Store
+Thumbs.db
