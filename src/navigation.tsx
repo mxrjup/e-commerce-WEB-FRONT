@@ -11,6 +11,7 @@ import SupportAgentOutlined from '@mui/icons-material/SupportAgentOutlined'
 import type { ReactNode } from 'react'
 import { hasAnyRole, type Role } from './auth/roles'
 import { HomePage } from './pages/HomePage'
+import { ReferencesPage } from './pages/references/ReferencesPage'
 
 /**
  * Every page of the back-office, in one place: the menu, the routes and the
@@ -44,7 +45,7 @@ export const navigation: NavSection[] = [
     items: [
       { path: '/products', label: 'Produits', icon: <SellOutlined />, task: { id: 'C15', issue: 12, owner: 'wassim-png' } },
       { path: '/inventory', label: 'Inventaire', icon: <Inventory2Outlined />, task: { id: 'C20', issue: 16, owner: 'wassim-png' } },
-      { path: '/references', label: 'Référentiels', icon: <CategoryOutlined />, task: { id: 'C19', issue: 93, owner: 'mxrjup' } },
+      { path: '/references', label: 'Référentiels', icon: <CategoryOutlined />, element: <ReferencesPage /> },
     ],
   },
   {
