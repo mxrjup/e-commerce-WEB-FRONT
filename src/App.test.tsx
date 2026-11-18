@@ -1,11 +1,16 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { App } from './App'
 import { routes } from './routes'
+import { fakeApi } from './test/fakeApi'
 import { fakeAuth, renderRoutes, renderWithAuth } from './test/renderWithAuth'
 
 describe('the back-office', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('greets a collaborator and lists the screens of their menu', async () => {
     renderRoutes(routes(), '/', fakeAuth(['client', 'collaborator']))
 
@@ -35,6 +40,8 @@ describe('the back-office', () => {
   })
 
   it('opens the admin pages to an admin', async () => {
+    // L'ecran charge ses donnees : une gateway factice repond des listes vides.
+    fakeApi(() => ({ status: 200, body: [] }))
     renderRoutes(routes(), '/mcp', fakeAuth(['collaborator', 'admin']))
 
     expect(await screen.findByRole('heading', { name: 'Accès MCP' })).toBeInTheDocument()
