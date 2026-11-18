@@ -7,12 +7,15 @@ import KeyOutlined from '@mui/icons-material/KeyOutlined'
 import LocalShippingOutlined from '@mui/icons-material/LocalShippingOutlined'
 import PeopleOutlined from '@mui/icons-material/PeopleOutlined'
 import SellOutlined from '@mui/icons-material/SellOutlined'
+import StorefrontOutlined from '@mui/icons-material/StorefrontOutlined'
 import SupportAgentOutlined from '@mui/icons-material/SupportAgentOutlined'
 import type { ReactNode } from 'react'
 import { hasAnyRole, type Role } from './auth/roles'
+import { CollaboratorsPage } from './pages/collaborators/CollaboratorsPage'
 import { HomePage } from './pages/HomePage'
 import { McpPage } from './pages/mcp/McpPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
+import { SettingsPage } from './pages/settings/SettingsPage'
 
 /**
  * Every page of the back-office, in one place: the menu, the routes and the
@@ -63,11 +66,15 @@ export const navigation: NavSection[] = [
     items: [
       {
         path: '/collaborators', label: 'Collaborateurs', icon: <AdminPanelSettingsOutlined />,
-        roles: ['admin'], task: { id: 'U08', issue: 94, owner: 'mxrjup' },
+        roles: ['admin'], element: <CollaboratorsPage />,
       },
       {
         path: '/mcp', label: 'Accès MCP', icon: <KeyOutlined />,
         roles: ['admin'], element: <McpPage />,
+      },
+      {
+        path: '/settings', label: 'Paramètres', icon: <StorefrontOutlined />,
+        roles: ['admin'], element: <SettingsPage />,
       },
     ],
   },

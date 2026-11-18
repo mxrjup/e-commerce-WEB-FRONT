@@ -8,11 +8,12 @@ describe('navigation', () => {
   it('hides the administration from collaborators', () => {
     expect(titles(['collaborator'])).toEqual([null, 'Catalogue', 'Ventes'])
     expect(paths(['collaborator'])).not.toContain('/mcp')
+    expect(paths(['collaborator'])).not.toContain('/settings')
   })
 
   it('shows everything to admins', () => {
     expect(titles(['collaborator', 'admin'])).toEqual([null, 'Catalogue', 'Ventes', 'Administration'])
-    expect(paths(['admin'])).toEqual(expect.arrayContaining(['/collaborators', '/mcp']))
+    expect(paths(['admin'])).toEqual(expect.arrayContaining(['/collaborators', '/mcp', '/settings']))
   })
 
   it('gives every entry a unique path, and either a screen or the task that brings it', () => {

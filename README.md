@@ -88,6 +88,7 @@ Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
 | Badge d'état avec libellé (`ok`, `neutral`, `danger`) | `StatusBadge` |
 | Confirmation d'une action réussie | `useNotify()` (`src/components/Notifications.tsx`) |
 | Copier une valeur (jeton, adresse) en le disant sur le bouton | `CopyButton` |
+| Une valeur à recopier telle quelle, avec son bouton « Copier » | `CodeLine` |
 | « il y a 5 minutes » qui reste juste tant que la page est ouverte | `formatRelative()` et `useNow()` |
 | Vérifier un champ comme l'API le fera | `src/lib/validation.ts` |
 | Pourcentages, dates, décimaux saisis « 5,5 » | `src/lib/format.ts` |
@@ -116,6 +117,12 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
 - **Accès MCP** (`src/pages/mcp/`, `M04`, administrateurs) : créer un jeton
   (affiché une seule fois), voir ses portées et sa dernière utilisation, le
   révoquer.
+- **Collaborateurs** (`src/pages/collaborators/`, `U08`, administrateurs) :
+  inviter un compte avec un mot de passe temporaire, changer son rôle, le
+  désactiver ou le réactiver. Jamais sur son propre compte, comme l'API.
+- **Paramètres** (`src/pages/settings/`, `U08`, administrateurs) : coordonnées,
+  mentions légales et frais de port de `U05` ; quitter l'écran avec des
+  modifications non enregistrées demande confirmation.
 - **Thème** (`src/theme.ts`) : les couleurs, la typographie (Manrope et
   JetBrains Mono, chargées depuis `@fontsource`, sans CDN) et les rayons de la charte
   `DESIGN-log.md`, partagée avec l'application mobile. Thème clair seulement
