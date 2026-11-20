@@ -58,6 +58,79 @@ export function productsPath(query: ProductQuery): string {
   return `${PRODUCTS}?${params}`
 }
 
+/**
+ * A variant as the back-office sees it (C04): prices excluding VAT, the
+ * purchase price and the exact stock included.
+ */
+export type AdminVariant = {
+  id: number
+  sku: string
+  designation: string
+  purchasePriceExclTax: number
+  salePriceExclTax: number
+  /** null when the variant is not on sale. */
+  discountPriceExclTax: number | null
+  ecoTax: number | null
+  weightKg: number
+  stock: number
+  alertThreshold: number
+  lowStock: boolean
+  values: { attributeId: number; attribute: string; valueId: number; value: string }[]
+  images: { id: number; url: string; position: number }[]
+}
+
+export type Specification = { key: string; value: string }
+
+/** A whole product sheet: GET /api/admin/catalog/products/{id}. */
+export type ProductDetail = {
+  id: number
+  title: string
+  slug: string
+  /** HTML from the editor, null when empty. */
+  description: string | null
+  status: ProductStatus
+  brand: Reference
+  category: Reference
+  vatRate: { id: number; label: string; rate: number }
+  universes: Reference[]
+  specifications: Specification[]
+  variants: AdminVariant[]
+  createdAt: string
+  updatedAt: string
+}
+
+/**
+ * What POST and PUT /products take. A PUT replaces the sheet: the
+ * specifications are the whole list, in display order. Without a slug, the
+ * service derives one from the title at creation and keeps it afterwards.
+ */
+export type ProductRequest = {
+  title: string
+  slug: string | null
+  description: string | null
+  brandId: number
+  categoryId: number
+  vatRateId: number
+  universeIds: number[]
+  specifications: Specification[]
+}
+
+export const productPath = (id: number) => `${PRODUCTS}/${id}`
+export const SPECIFICATION_KEYS = '/api/admin/catalog/specification-keys'
+
+/**
+ * The price a customer pays for one unit, as catalog-service computes it
+ * (Prices.currentInclTax): the discount if any, plus the eco-tax, then the
+ * VAT rounded half up to the cent. Computed in whole cents and hundredths
+ * of a percent, so that no float error moves a cent: 0.1 + 0.2 is not 0.3.
+ */
+export function unitPriceInclTax(variant: AdminVariant, ratePercent: number): number {
+  const cents = Math.round(((variant.discountPriceExclTax ?? variant.salePriceExclTax) + (variant.ecoTax ?? 0)) * 100)
+  const rate = Math.round(ratePercent * 100)
+  const vatCents = Math.floor((cents * rate + 5000) / 10000)
+  return (cents + vatCents) / 100
+}
+
 export const STATUSES: readonly { status: ProductStatus; label: string }[] = [
   { status: 'PUBLIE', label: 'Publié' },
   { status: 'BROUILLON', label: 'Brouillon' },
