@@ -1,14 +1,17 @@
 import { Alert, Snackbar } from '@mui/material'
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
 
-type Notify = (message: string) => void
+type Notify = (message: string, severity?: 'success' | 'error') => void
 
 const NotifyContext = createContext<Notify>(() => {})
 
-/** Confirms an action that succeeded, at the bottom of the screen. Failures stay in their dialog or page. */
+/**
+ * Confirms an action that succeeded, at the bottom of the screen. A failure
+ * shows in its dialog or page; here only when the action had neither.
+ */
 export function NotificationsProvider({ children }: { children: ReactNode }) {
-  const [notice, setNotice] = useState<{ message: string; key: number } | null>(null)
-  const notify = useCallback<Notify>((message) => setNotice({ message, key: Date.now() }), [])
+  const [notice, setNotice] = useState<{ message: string; severity: 'success' | 'error'; key: number } | null>(null)
+  const notify = useCallback<Notify>((message, severity = 'success') => setNotice({ message, severity, key: Date.now() }), [])
 
   return (
     <NotifyContext.Provider value={notify}>
@@ -16,11 +19,12 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       <Snackbar
         key={notice?.key}
         open={notice !== null}
-        autoHideDuration={4000}
+        // Une erreur reste jusqu'a ce qu'on la ferme : elle doit etre lue.
+        autoHideDuration={notice?.severity === 'error' ? null : 4000}
         onClose={(_, reason) => reason !== 'clickaway' && setNotice(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" variant="filled" onClose={() => setNotice(null)} sx={{ width: '100%' }}>
+        <Alert severity={notice?.severity ?? 'success'} variant="filled" onClose={() => setNotice(null)} sx={{ width: '100%' }}>
           {notice?.message}
         </Alert>
       </Snackbar>
