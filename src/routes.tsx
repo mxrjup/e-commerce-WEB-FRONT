@@ -5,16 +5,22 @@ import { allNavItems } from './navigation'
 import { ComingSoonPage } from './pages/ComingSoonPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
-/** The routes, built from the menu: one route per entry, guarded by its roles. */
+/** The routes, built from the menu: one route per entry and per page under it, guarded by its roles. */
 export function routes(): RouteObject[] {
   return [
     {
       element: <AppLayout />,
       children: [
-        ...allNavItems().map((item) => ({
-          path: item.path,
-          element: <RequireRole roles={item.roles}>{item.element ?? <ComingSoonPage item={item} />}</RequireRole>,
-        })),
+        ...allNavItems().flatMap((item) => [
+          {
+            path: item.path,
+            element: <RequireRole roles={item.roles}>{item.element ?? <ComingSoonPage item={item} />}</RequireRole>,
+          },
+          ...(item.pages ?? []).map((page) => ({
+            path: page.path,
+            element: <RequireRole roles={item.roles}>{page.element}</RequireRole>,
+          })),
+        ]),
         { path: '*', element: <NotFoundPage /> },
       ],
     },
