@@ -11,6 +11,7 @@ import SupportAgentOutlined from '@mui/icons-material/SupportAgentOutlined'
 import type { ReactNode } from 'react'
 import { hasAnyRole, type Role } from './auth/roles'
 import { HomePage } from './pages/HomePage'
+import { McpPage } from './pages/mcp/McpPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
 
 /**
@@ -66,7 +67,7 @@ export const navigation: NavSection[] = [
       },
       {
         path: '/mcp', label: 'Accès MCP', icon: <KeyOutlined />,
-        roles: ['admin'], task: { id: 'M04', issue: 95, owner: 'mxrjup' },
+        roles: ['admin'], element: <McpPage />,
       },
     ],
   },

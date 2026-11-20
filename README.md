@@ -87,6 +87,8 @@ Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
 | Confirmation d'une action destructrice (bouton jamais rempli, comme le veut la charte) | `ConfirmDialog` |
 | Badge d'état avec libellé (`ok`, `neutral`, `danger`) | `StatusBadge` |
 | Confirmation d'une action réussie | `useNotify()` (`src/components/Notifications.tsx`) |
+| Copier une valeur (jeton, adresse) en le disant sur le bouton | `CopyButton` |
+| « il y a 5 minutes » qui reste juste tant que la page est ouverte | `formatRelative()` et `useNow()` |
 | Vérifier un champ comme l'API le fera | `src/lib/validation.ts` |
 | Pourcentages, dates, décimaux saisis « 5,5 » | `src/lib/format.ts` |
 
@@ -111,6 +113,9 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
 - **Référentiels** (`src/pages/references/`, `C19`) : marques, catégories (en
   arbre), univers et taux de TVA, un onglet chacun, l'onglet ouvert dans
   l'adresse (`/references?onglet=tva`).
+- **Accès MCP** (`src/pages/mcp/`, `M04`, administrateurs) : créer un jeton
+  (affiché une seule fois), voir ses portées et sa dernière utilisation, le
+  révoquer.
 - **Thème** (`src/theme.ts`) : les couleurs, la typographie (Manrope et
   JetBrains Mono, chargées depuis `@fontsource`, sans CDN) et les rayons de la charte
   `DESIGN-log.md`, partagée avec l'application mobile. Thème clair seulement
