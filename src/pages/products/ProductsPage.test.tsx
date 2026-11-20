@@ -98,6 +98,17 @@ describe('the product list (C15)', () => {
     expect(screen.getByRole('button', { name: 'Publié 17' })).toHaveAttribute('aria-pressed', 'true')
   })
 
+  it('opens a filtered address without a warning while the lists load', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    fakeApi(products([g915]), ...references)
+    open('/products?marque=3&categorie=1')
+
+    expect(await screen.findByRole('combobox', { name: 'Catégorie' })).toHaveTextContent('Périphériques')
+    expect(screen.getByRole('combobox', { name: 'Marque' })).toHaveTextContent('Logitech')
+    // MUI previent quand la valeur choisie n'est pas encore dans la liste.
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('out-of-range')
+  })
+
   it('filters on a status chip and goes back to the first page', async () => {
     const api = fakeApi(products([g915], 45), ...references)
     open('/products?page=2')

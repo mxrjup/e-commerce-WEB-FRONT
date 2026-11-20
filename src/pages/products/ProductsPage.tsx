@@ -49,6 +49,10 @@ export function ProductsPage() {
   const brands = useList(useCallback(() => api<Brand[]>(PATHS.brands), [api]))
   const categories = useList(useCallback(() => api<Category[]>(PATHS.categories), [api]))
 
+  // Tant que la liste n'est pas arrivee, la valeur de l'adresse n'est pas une option : MUI avertirait.
+  const brandValue = brands.items?.some((brand) => brand.id === query.brandId) ? query.brandId : ''
+  const categoryValue = categories.items?.some((category) => category.id === query.categoryId) ? query.categoryId : ''
+
   const rows = page?.content ?? []
   const pastTheEnd = page !== null && rows.length === 0 && query.page > 0
 
@@ -68,7 +72,7 @@ export function ProductsPage() {
             select
             size="small"
             label="Marque"
-            value={query.brandId ?? ''}
+            value={brandValue}
             onChange={(event) => change({ brandId: event.target.value === '' ? null : Number(event.target.value) })}
             sx={{ minWidth: 200 }}
             slotProps={{ inputLabel: { shrink: true }, select: { displayEmpty: true } }}
@@ -80,7 +84,7 @@ export function ProductsPage() {
             select
             size="small"
             label="Catégorie"
-            value={query.categoryId ?? ''}
+            value={categoryValue}
             onChange={(event) => change({ categoryId: event.target.value === '' ? null : Number(event.target.value) })}
             helperText="Sous-catégories comprises."
             sx={{ minWidth: 260 }}
