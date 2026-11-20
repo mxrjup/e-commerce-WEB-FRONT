@@ -126,7 +126,7 @@ export function SettingsPage() {
             <Grid container spacing={2.5}>
               {section.fields.map((field) => (
                 <Grid key={field.key} size={{ xs: 12, md: field.kind === 'long' ? 12 : 6 }}>
-                  {form ? input(field) : <Skeleton variant="rounded" height={56} />}
+                  {form ? input(field) : <Skeleton variant="rounded" height={56} animation={loadError === null ? 'pulse' : false} />}
                 </Grid>
               ))}
             </Grid>

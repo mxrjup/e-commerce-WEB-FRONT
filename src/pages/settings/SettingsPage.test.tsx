@@ -41,6 +41,25 @@ describe('the shop settings (U08)', () => {
     expect(screen.getByText('Tout est enregistré.')).toBeInTheDocument()
   })
 
+  it('says why the settings did not load, and loads them again on retry', async () => {
+    let attempts = 0
+    fakeApi((call) => {
+      if (call.method !== 'GET' || call.path !== PATH) return undefined
+      attempts += 1
+      return attempts === 1 ? { status: 503, body: { status: 503, message: 'Service unavailable' } } : { status: 200, body: settings }
+    })
+    renderRoutes(routes(), '/settings', fakeAuth(['collaborator', 'admin']))
+
+    const retry = await screen.findByRole('button', { name: 'Réessayer' })
+    expect(screen.queryByRole('textbox', { name: 'Livraison standard' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeDisabled()
+
+    await userEvent.click(retry)
+    expect(await screen.findByRole('textbox', { name: 'Livraison standard' })).toHaveValue('4,99')
+    expect(screen.queryByRole('button', { name: 'Réessayer' })).not.toBeInTheDocument()
+    expect(attempts).toBe(2)
+  })
+
   it('refuses what the API would refuse, and puts the cursor on it', async () => {
     const api = fakeApi(on('GET', PATH, 200, settings))
     renderRoutes(routes(), '/settings', fakeAuth(['collaborator', 'admin']))
