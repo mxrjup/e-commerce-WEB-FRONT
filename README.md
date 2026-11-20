@@ -89,6 +89,7 @@ Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
 | Badge d'état avec libellé (`ok`, `neutral`, `danger`) | `StatusBadge` |
 | Confirmation d'une action réussie | `useNotify()` (`src/components/Notifications.tsx`) |
 | Copier une valeur (jeton, adresse) en le disant sur le bouton | `CopyButton` |
+| Texte riche (gras, italique, intertitre, listes, liens) qui ne renvoie que du HTML propre | `RichTextEditor` (TipTap) |
 | Une valeur à recopier telle quelle, avec son bouton « Copier » | `CodeLine` |
 | « il y a 5 minutes » qui reste juste tant que la page est ouverte | `formatRelative()` et `useNow()` |
 | Vérifier un champ comme l'API le fera | `src/lib/validation.ts` |
@@ -121,6 +122,16 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
   un rechargement, le bouton retour ou un lien envoyé retombent sur la même
   vue. Un tableau MUI plutôt que le DataGrid de MUI X : le tri et la pagination
   se font déjà côté serveur, et c'est une dépendance lourde de moins.
+- **Fiche produit** (`/products/nouveau` et `/products/{id}`, `C16`) : titre,
+  slug, description en texte riche, caractéristiques (les clés déjà utilisées
+  dans la catégorie sont proposées), marque, catégorie, TVA et univers. Le
+  statut suit les règles de `C04` : publier demande une variante, un produit
+  ne revient jamais en brouillon, seul un brouillon se supprime. Les variantes
+  s'affichent avec leur prix TTC, calculé comme `catalog-service`
+  (écotaxe comprise, TVA arrondie au centime). Quitter la fiche avec des
+  modifications non enregistrées demande confirmation. L'éditeur (TipTap,
+  environ 450 ko) est chargé à part, à l'ouverture d'une fiche
+  (`LazyProductFormPage`) : le reste du back-office ne le télécharge pas.
 - **Référentiels** (`src/pages/references/`, `C19`) : marques, catégories (en
   arbre), univers et taux de TVA, un onglet chacun, l'onglet ouvert dans
   l'adresse (`/references?onglet=tva`).
