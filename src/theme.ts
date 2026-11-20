@@ -25,6 +25,9 @@ export const tokens = {
 
 const font = 'Manrope, system-ui, sans-serif'
 
+/** For what is compared rather than read: identifiers, slugs, rates, amounts. Right-aligned in a column. */
+export const monoFont = '"JetBrains Mono", ui-monospace, monospace'
+
 export const theme = createTheme({
   palette: {
     mode: 'light',
@@ -60,6 +63,16 @@ export const theme = createTheme({
     },
     MuiDrawer: {
       styleOverrides: { paper: { backgroundColor: tokens.surfaceDark, color: tokens.onDark, borderRight: 'none' } },
+    },
+    // table-header et table-row de la charte : en-tete sur fond chaud, en capitales, filet entre les lignes.
+    MuiTableCell: {
+      styleOverrides: {
+        root: { borderBottom: `1px solid ${tokens.line}`, padding: '14px 16px', fontSize: 14 },
+        head: {
+          backgroundColor: tokens.canvasWarm, color: tokens.ink3,
+          fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+        },
+      },
     },
   },
 })

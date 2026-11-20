@@ -72,6 +72,30 @@ const { getToken } = useAuth()
 const inventory = await apiFetch<Page<InventoryItem>>(getToken, '/api/admin/catalog/inventory?lowStock=true')
 ```
 
+### Briques communes
+
+Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
+
+| Besoin | Où |
+|---|---|
+| Appeler l'API sans recharger l'écran à chaque renouvellement du jeton | `useApi()` (`src/api/useApi.ts`) |
+| Charger une liste, la recharger après une modification | `useList()` (`src/api/useList.ts`) |
+| Dire une erreur d'API en français | `errorMessage()` (`src/api/errors.ts`) |
+| Titre d'écran et action principale | `PageHeader` |
+| Tableau dans son panneau : chargement, erreur avec « Réessayer », liste vide, défilement horizontal | `TableFrame` |
+| Formulaire dans une fenêtre, qui garde la saisie si l'enregistrement échoue | `FormDialog` |
+| Confirmation d'une action destructrice (bouton jamais rempli, comme le veut la charte) | `ConfirmDialog` |
+| Badge d'état avec libellé (`ok`, `neutral`, `danger`) | `StatusBadge` |
+| Confirmation d'une action réussie | `useNotify()` (`src/components/Notifications.tsx`) |
+| Copier une valeur (jeton, adresse) en le disant sur le bouton | `CopyButton` |
+| « il y a 5 minutes » qui reste juste tant que la page est ouverte | `formatRelative()` et `useNow()` |
+| Vérifier un champ comme l'API le fera | `src/lib/validation.ts` |
+| Pourcentages, dates, décimaux saisis « 5,5 » | `src/lib/format.ts` |
+
+Les nombres, slugs et identifiants s'écrivent en `monoFont` (JetBrains Mono),
+alignés à droite dans une colonne. Pour tester un écran sans la pile
+`e-commerce-BACK`, `fakeApi()` (`src/test/fakeApi.ts`) remplace la gateway.
+
 ## Ce qui est en place
 
 - **Connexion** (`src/auth/AuthProvider.tsx`) : flux *authorization code* avec
@@ -86,8 +110,14 @@ const inventory = await apiFetch<Page<InventoryItem>>(getToken, '/api/admin/cata
 - **Mise en page** (`src/layout/AppLayout.tsx`) : menu latéral sombre (tiroir
   sur petit écran), barre du haut avec le rôle, l'utilisateur et la
   déconnexion.
-- **Thème** (`src/theme.ts`) : les couleurs, la typographie (Manrope, chargée
-  depuis le paquet `@fontsource/manrope`, sans CDN) et les rayons de la charte
+- **Référentiels** (`src/pages/references/`, `C19`) : marques, catégories (en
+  arbre), univers et taux de TVA, un onglet chacun, l'onglet ouvert dans
+  l'adresse (`/references?onglet=tva`).
+- **Accès MCP** (`src/pages/mcp/`, `M04`, administrateurs) : créer un jeton
+  (affiché une seule fois), voir ses portées et sa dernière utilisation, le
+  révoquer.
+- **Thème** (`src/theme.ts`) : les couleurs, la typographie (Manrope et
+  JetBrains Mono, chargées depuis `@fontsource`, sans CDN) et les rayons de la charte
   `DESIGN-log.md`, partagée avec l'application mobile. Thème clair seulement
   pour l'instant.
 

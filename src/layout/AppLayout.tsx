@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
 import logo from '../assets/logo-log-lockup.svg'
 import { useAuth } from '../auth/AuthContext'
+import { NotificationsProvider } from '../components/Notifications'
 import { visibleNavigation } from '../navigation'
 import { tokens } from '../theme'
 
@@ -103,7 +104,9 @@ export function AppLayout() {
 
       <Box component="main" sx={{ flexGrow: 1, minWidth: 0, p: { xs: 2, md: 4 } }}>
         <Toolbar />
-        <Outlet />
+        <NotificationsProvider>
+          <Outlet />
+        </NotificationsProvider>
       </Box>
     </Box>
   )
