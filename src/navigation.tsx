@@ -14,6 +14,7 @@ import { hasAnyRole, type Role } from './auth/roles'
 import { CollaboratorsPage } from './pages/collaborators/CollaboratorsPage'
 import { HomePage } from './pages/HomePage'
 import { McpPage } from './pages/mcp/McpPage'
+import { ProductsPage } from './pages/products/ProductsPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 
@@ -47,7 +48,7 @@ export const navigation: NavSection[] = [
   {
     title: 'Catalogue',
     items: [
-      { path: '/products', label: 'Produits', icon: <SellOutlined />, task: { id: 'C15', issue: 12, owner: 'wassim-png' } },
+      { path: '/products', label: 'Produits', icon: <SellOutlined />, element: <ProductsPage /> },
       { path: '/inventory', label: 'Inventaire', icon: <Inventory2Outlined />, task: { id: 'C20', issue: 16, owner: 'wassim-png' } },
       { path: '/references', label: 'Référentiels', icon: <CategoryOutlined />, element: <ReferencesPage /> },
     ],

@@ -80,6 +80,7 @@ Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
 |---|---|
 | Appeler l'API sans recharger l'écran à chaque renouvellement du jeton | `useApi()` (`src/api/useApi.ts`) |
 | Charger une liste, la recharger après une modification | `useList()` (`src/api/useList.ts`) |
+| Charger autre chose qu'une liste (une page de résultats), à chaque changement de filtre, en ignorant une réponse arrivée trop tard | `useLoad()` (`src/api/useLoad.ts`), sur lequel repose `useList()` |
 | Dire une erreur d'API en français | `errorMessage()` (`src/api/errors.ts`) |
 | Titre d'écran et action principale | `PageHeader` |
 | Tableau dans son panneau : chargement, erreur avec « Réessayer », liste vide, défilement horizontal | `TableFrame` |
@@ -91,7 +92,7 @@ Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
 | Une valeur à recopier telle quelle, avec son bouton « Copier » | `CodeLine` |
 | « il y a 5 minutes » qui reste juste tant que la page est ouverte | `formatRelative()` et `useNow()` |
 | Vérifier un champ comme l'API le fera | `src/lib/validation.ts` |
-| Pourcentages, dates, décimaux saisis « 5,5 » | `src/lib/format.ts` |
+| Prix (« 89,90 € »), pourcentages, dates, décimaux saisis « 5,5 » | `src/lib/format.ts` |
 
 Les nombres, slugs et identifiants s'écrivent en `monoFont` (JetBrains Mono),
 alignés à droite dans une colonne. Pour tester un écran sans la pile
@@ -111,6 +112,15 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
 - **Mise en page** (`src/layout/AppLayout.tsx`) : menu latéral sombre (tiroir
   sur petit écran), barre du haut avec le rôle, l'utilisateur et la
   déconnexion.
+- **Produits** (`src/pages/products/`, `C15`) : tout le catalogue, brouillons
+  et produits archivés compris, sur l'API admin de `catalog-service` (`C04`).
+  Recherche (titre, slug ou SKU, envoyée quand on arrête de taper), puces de
+  statut avec leur compteur, marque, catégorie (sous-catégories comprises),
+  tri par titre ou dernière modification, pagination côté serveur. Les
+  filtres sont dans l'adresse, en français (`/products?statut=brouillon&page=2`) :
+  un rechargement, le bouton retour ou un lien envoyé retombent sur la même
+  vue. Un tableau MUI plutôt que le DataGrid de MUI X : le tri et la pagination
+  se font déjà côté serveur, et c'est une dépendance lourde de moins.
 - **Référentiels** (`src/pages/references/`, `C19`) : marques, catégories (en
   arbre), univers et taux de TVA, un onglet chacun, l'onglet ouvert dans
   l'adresse (`/references?onglet=tva`).

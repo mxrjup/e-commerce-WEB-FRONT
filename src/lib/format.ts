@@ -5,6 +5,13 @@ export function formatPercent(value: number): string {
   return `${percent.format(value)} %`
 }
 
+const price = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })
+
+/** 89.9 → « 89,90 € » */
+export function formatPrice(value: number): string {
+  return price.format(value)
+}
+
 /**
  * A decimal typed in French or English: « 5,5 » and « 5.5 » both give 5.5.
  * Returns null for anything that is not a plain decimal number.
