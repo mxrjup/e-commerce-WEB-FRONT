@@ -122,7 +122,10 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
   désactiver ou le réactiver. Jamais sur son propre compte, comme l'API.
 - **Paramètres** (`src/pages/settings/`, `U08`, administrateurs) : coordonnées,
   mentions légales et frais de port de `U05` ; quitter l'écran avec des
-  modifications non enregistrées demande confirmation.
+  modifications non enregistrées demande confirmation. **Limite connue :** les
+  frais de port enregistrés ici ne sont pas encore lus par le calcul des
+  commandes : `ShippingService` d'order-service (`e-commerce-BACK`) garde ses
+  montants codés en dur tant qu'il ne lit pas `/api/admin/store-settings`.
 - **Thème** (`src/theme.ts`) : les couleurs, la typographie (Manrope et
   JetBrains Mono, chargées depuis `@fontsource`, sans CDN) et les rayons de la charte
   `DESIGN-log.md`, partagée avec l'application mobile. Thème clair seulement
