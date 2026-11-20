@@ -1,11 +1,12 @@
+import AddOutlined from '@mui/icons-material/AddOutlined'
 import ClearOutlined from '@mui/icons-material/ClearOutlined'
 import SearchOutlined from '@mui/icons-material/SearchOutlined'
 import {
-  Box, Button, Chip, InputAdornment, MenuItem, Stack, TableCell, TablePagination, TableRow, TableSortLabel, TextField,
+  Box, Button, Chip, InputAdornment, Link, MenuItem, Stack, TableCell, TablePagination, TableRow, TableSortLabel, TextField,
   Typography,
 } from '@mui/material'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link as RouterLink, useSearchParams } from 'react-router'
 import { errorMessage } from '../../api/errors'
 import { useApi } from '../../api/useApi'
 import { useList } from '../../api/useList'
@@ -61,6 +62,7 @@ export function ProductsPage() {
       <PageHeader
         title="Produits"
         description="Tout le catalogue, brouillons et produits archivés compris, avec le stock et le prix HT de chaque fiche."
+        action={<Button component={RouterLink} to="/products/nouveau" variant="contained" startIcon={<AddOutlined />}>Nouveau produit</Button>}
       />
 
       <Stack spacing={2}>
@@ -250,7 +252,9 @@ function ProductRow({ product }: { product: ProductSummary }) {
   return (
     <TableRow hover>
       <TableCell component="th" scope="row" sx={{ maxWidth: 320 }}>
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>{product.title}</Typography>
+        <Link component={RouterLink} to={`/products/${product.id}`} variant="body2" underline="hover" color="text.primary" sx={{ fontWeight: 600 }}>
+          {product.title}
+        </Link>
         <Typography variant="caption" color="text.secondary" sx={{ fontFamily: monoFont, display: 'block' }} noWrap>
           {product.slug}
         </Typography>

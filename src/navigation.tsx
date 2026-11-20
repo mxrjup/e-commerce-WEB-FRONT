@@ -14,6 +14,7 @@ import { hasAnyRole, type Role } from './auth/roles'
 import { CollaboratorsPage } from './pages/collaborators/CollaboratorsPage'
 import { HomePage } from './pages/HomePage'
 import { McpPage } from './pages/mcp/McpPage'
+import { LazyProductFormPage } from './pages/products/LazyProductFormPage'
 import { ProductsPage } from './pages/products/ProductsPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
@@ -36,6 +37,8 @@ export type NavItem = {
   element?: ReactNode
   /** While the screen is not delivered: the board task and its owner (GitHub login). */
   task?: { id: string; issue: number; owner: string | null }
+  /** Pages reached from this one (a product sheet), not in the menu, open to the same roles. */
+  pages?: { path: string; element: ReactNode }[]
 }
 
 export type NavSection = { title: string | null; items: NavItem[] }
@@ -48,7 +51,11 @@ export const navigation: NavSection[] = [
   {
     title: 'Catalogue',
     items: [
-      { path: '/products', label: 'Produits', icon: <SellOutlined />, element: <ProductsPage /> },
+      {
+        path: '/products', label: 'Produits', icon: <SellOutlined />, element: <ProductsPage />,
+        // Une seule route pour creer et modifier : apres une creation, seule la fiche se recharge.
+        pages: [{ path: '/products/:id', element: <LazyProductFormPage /> }],
+      },
       { path: '/inventory', label: 'Inventaire', icon: <Inventory2Outlined />, task: { id: 'C20', issue: 16, owner: 'wassim-png' } },
       { path: '/references', label: 'Référentiels', icon: <CategoryOutlined />, element: <ReferencesPage /> },
     ],
