@@ -5,7 +5,7 @@ import {
   Button, IconButton, InputAdornment, Pagination, Stack, TableCell, TableRow, TextField, Typography,
 } from '@mui/material'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router'
 import { errorMessage } from '../../api/errors'
 import { useApi } from '../../api/useApi'
 import { useLoad } from '../../api/useLoad'
@@ -34,11 +34,8 @@ export function CustomersPage() {
 
   const urlQuery = searchParams.get('recherche') ?? ''
   const currentPage = parsePositivePage(searchParams.get('page'))
-  const [inputQuery, setInputQuery] = useState(urlQuery)
-
-  useEffect(() => {
-    setInputQuery(urlQuery)
-  }, [urlQuery])
+  const [draft, setDraft] = useState({ forUrl: urlQuery, value: urlQuery })
+  const inputQuery = draft.forUrl === urlQuery ? draft.value : urlQuery
 
   useEffect(() => {
     const trimmed = inputQuery.trim()
@@ -75,7 +72,7 @@ export function CustomersPage() {
   }
 
   function clearSearch() {
-    setInputQuery('')
+    setDraft({ forUrl: '', value: '' })
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
       next.delete('recherche')
@@ -97,7 +94,7 @@ export function CustomersPage() {
           label="Rechercher un client"
           placeholder="Nom, prénom ou adresse e-mail"
           value={inputQuery}
-          onChange={(event) => setInputQuery(event.target.value)}
+          onChange={(event) => setDraft({ forUrl: urlQuery, value: event.target.value })}
           sx={{ width: { xs: '100%', sm: 320 } }}
           slotProps={{
             input: {

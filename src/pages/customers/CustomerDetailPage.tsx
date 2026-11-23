@@ -2,11 +2,11 @@ import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined'
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined'
 import KeyboardArrowUpOutlined from '@mui/icons-material/KeyboardArrowUpOutlined'
 import {
-  Alert, Box, Button, Collapse, Divider, IconButton, Paper, Skeleton, Stack, Table, TableBody,
+  Alert, Box, Button, Divider, IconButton, Paper, Skeleton, Stack, Table, TableBody,
   TableCell, TableHead, TableRow, Typography,
 } from '@mui/material'
 import { Fragment, useCallback, useMemo, useState } from 'react'
-import { Link as RouterLink, useLocation, useParams } from 'react-router-dom'
+import { Link as RouterLink, useLocation, useParams } from 'react-router'
 import { errorMessage } from '../../api/errors'
 import { useApi } from '../../api/useApi'
 import { useLoad } from '../../api/useLoad'
@@ -59,7 +59,7 @@ export function CustomerDetailPage() {
   const { data, error, loading, reload } = useLoad(load)
 
   const customer = data?.customer ?? initialCustomer
-  const orders = data?.orders ?? []
+  const orders = useMemo(() => data?.orders ?? [], [data?.orders])
   const summary = useMemo(() => summarizeCustomerOrders(orders), [orders])
 
   if (!validId) {
@@ -270,41 +270,39 @@ export function CustomerDetailPage() {
                 </TableCell>
               </TableRow>
 
-              <TableRow>
-                <TableCell colSpan={7} sx={{ py: 0, bgcolor: tokens.canvasWarm, borderBottom: expanded ? undefined : 'none' }}>
-                  <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <Box sx={{ py: 2, px: 1 }}>
-                      <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                        Détail des articles ({order.items.length} ligne{order.items.length > 1 ? 's' : ''})
-                      </Typography>
-                      <Table size="small" aria-label={`Articles de la commande ${order.orderNumber}`}>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Désignation</TableCell>
-                            <TableCell align="right">Quantité</TableCell>
-                            <TableCell align="right">PU HT</TableCell>
-                            <TableCell align="right">TVA</TableCell>
-                            <TableCell align="right">Sous-total TTC</TableCell>
+              {expanded && (
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ py: 2, px: 3, bgcolor: tokens.canvasWarm }}>
+                    <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                      Détail des articles ({order.items.length} ligne{order.items.length > 1 ? 's' : ''})
+                    </Typography>
+                    <Table size="small" aria-label={`Articles de la commande ${order.orderNumber}`}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Désignation</TableCell>
+                          <TableCell align="right">Quantité</TableCell>
+                          <TableCell align="right">PU HT</TableCell>
+                          <TableCell align="right">TVA</TableCell>
+                          <TableCell align="right">Sous-total TTC</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {order.items.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>{item.designation}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: monoFont }}>{item.quantity}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: monoFont }}>{formatPrice(item.unitPriceExclTax)}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: monoFont }}>{formatPercent(item.vatRate)}</TableCell>
+                            <TableCell align="right" sx={{ fontFamily: monoFont, fontWeight: 600 }}>
+                              {formatPrice(item.subTotalInclTax)}
+                            </TableCell>
                           </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {order.items.map((item) => (
-                            <TableRow key={item.id}>
-                              <TableCell>{item.designation}</TableCell>
-                              <TableCell align="right" sx={{ fontFamily: monoFont }}>{item.quantity}</TableCell>
-                              <TableCell align="right" sx={{ fontFamily: monoFont }}>{formatPrice(item.unitPriceExclTax)}</TableCell>
-                              <TableCell align="right" sx={{ fontFamily: monoFont }}>{formatPercent(item.vatRate)}</TableCell>
-                              <TableCell align="right" sx={{ fontFamily: monoFont, fontWeight: 600 }}>
-                                {formatPrice(item.subTotalInclTax)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Box>
-                  </Collapse>
-                </TableCell>
-              </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableCell>
+                </TableRow>
+              )}
             </Fragment>
           )
         })}
