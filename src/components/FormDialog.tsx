@@ -23,6 +23,9 @@ export function FormDialog({ open, title, submitLabel, onClose, onSubmit, error,
 
   async function submit(event: FormEvent) {
     event.preventDefault()
+    // Le dialogue s'affiche hors de la page, mais React fait remonter ses evenements a ses parents :
+    // ouvert depuis un autre formulaire (une fiche produit), il l'enverrait aussi.
+    event.stopPropagation()
     setSaving(true)
     try {
       await onSubmit()
