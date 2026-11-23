@@ -126,15 +126,24 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
   slug, description en texte riche, caractéristiques (les clés déjà utilisées
   dans la catégorie sont proposées), marque, catégorie, TVA et univers. Le
   statut suit les règles de `C04` : publier demande une variante, un produit
-  ne revient jamais en brouillon, seul un brouillon se supprime. Les variantes
-  s'affichent avec leur prix TTC, calculé comme `catalog-service`
-  (écotaxe comprise, TVA arrondie au centime). Quitter la fiche avec des
-  modifications non enregistrées demande confirmation. L'éditeur (TipTap,
-  environ 450 ko) est chargé à part, à l'ouverture d'une fiche
-  (`LazyProductFormPage`) : le reste du back-office ne le télécharge pas.
-- **Référentiels** (`src/pages/references/`, `C19`) : marques, catégories (en
-  arbre), univers et taux de TVA, un onglet chacun, l'onglet ouvert dans
-  l'adresse (`/references?onglet=tva`).
+  ne revient jamais en brouillon, seul un brouillon se supprime. Quitter la
+  fiche avec des modifications non enregistrées demande confirmation.
+  L'éditeur (TipTap, environ 450 ko) est chargé à part, à l'ouverture d'une
+  fiche (`LazyProductFormPage`) : le reste du back-office ne le télécharge pas.
+- **Variantes** (section de la fiche produit, `C17`) : prix HT, TTC (remise,
+  écotaxe et TVA comprises, calculé comme `catalog-service`), marge et stock
+  de chacune. On en ajoute une (une liste par attribut, donc jamais « Noir +
+  Blanc »), on la modifie sans jamais envoyer son stock (il passe par
+  l'inventaire), et on ne la supprime que sur un brouillon. « Générer les
+  combinaisons » prépare les variantes manquantes à partir des valeurs
+  cochées, avec un SKU proposé (`CLAVIER-K2-NOIR-AZERTY`) et un prix commun ;
+  l'API n'ayant pas de création groupée, elles sont créées une par une et les
+  refus sont listés avec leur raison. 50 combinaisons au plus à la fois.
+- **Référentiels** (`src/pages/references/`, `C19`, `C17`) : marques,
+  catégories (en arbre), univers, taux de TVA et attributs avec leurs valeurs
+  (renommer une valeur la garde sur ses variantes ; une valeur utilisée ne se
+  retire pas), un onglet chacun, l'onglet ouvert dans l'adresse
+  (`/references?onglet=attributs`).
 - **Accès MCP** (`src/pages/mcp/`, `M04`, administrateurs) : créer un jeton
   (affiché une seule fois), voir ses portées et sa dernière utilisation, le
   révoquer.
