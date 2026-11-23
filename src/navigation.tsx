@@ -18,6 +18,7 @@ import { LazyProductFormPage } from './pages/products/LazyProductFormPage'
 import { ProductsPage } from './pages/products/ProductsPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
+import { LazyStatisticsPage } from './pages/statistics/LazyStatisticsPage'
 
 /**
  * Every page of the back-office, in one place: the menu, the routes and the
@@ -66,7 +67,7 @@ export const navigation: NavSection[] = [
       { path: '/orders', label: 'Commandes', icon: <LocalShippingOutlined />, task: { id: 'O13', issue: 37, owner: 'YoanBst' } },
       { path: '/customers', label: 'Clients', icon: <PeopleOutlined />, task: { id: 'U09', issue: 74, owner: null } },
       { path: '/support', label: 'SAV', icon: <SupportAgentOutlined />, task: { id: 'S05', issue: 75, owner: null } },
-      { path: '/statistics', label: 'Statistiques', icon: <InsightsOutlined />, task: { id: 'O14', issue: 49, owner: 'MalekkJam' } },
+      { path: '/statistics', label: 'Statistiques', icon: <InsightsOutlined />, element: <LazyStatisticsPage /> },
     ],
   },
   {
