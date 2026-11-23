@@ -24,7 +24,19 @@ export type UniverseRequest = Omit<Universe, 'id' | 'slug'> & { slug: string | n
 export type VatRate = { id: number; label: string; rate: number; defaultRate: boolean }
 export type VatRateRequest = Omit<VatRate, 'id'>
 
-/** The calls for one kind of entry; the paths and verbs are the same for all four. */
+/**
+ * What makes the variants of a product differ (Couleur, Layout clavier) and
+ * its values, in display order. Shared by every product that uses it (C04).
+ */
+export type Attribute = { id: number; name: string; values: { id: number; value: string; position: number }[] }
+/**
+ * A PUT replaces the whole list: a value sent with its id is kept, and
+ * renamed if its text changed; one without id is created; one left out is
+ * deleted, unless a variant uses it.
+ */
+export type AttributeRequest = { name: string; values: { id: number | null; value: string }[] }
+
+/** The calls for one kind of entry; the paths and verbs are the same for all of them. */
 export function resource<T, R>(api: Api, path: string) {
   return {
     list: () => api<T[]>(path),
@@ -39,6 +51,7 @@ export const PATHS = {
   categories: '/api/admin/catalog/categories',
   universes: '/api/admin/catalog/universes',
   vatRates: '/api/admin/catalog/vat-rates',
+  attributes: '/api/admin/catalog/attributes',
 } as const
 
 /**
@@ -65,4 +78,13 @@ export const translations: Translation[] = [
     () => 'Cette catégorie a des sous-catégories : déplacez-les ou supprimez-les d’abord.'],
   [/is the default VAT rate: mark another rate as default/,
     () => 'C’est le taux par défaut : marquez d’abord un autre taux comme taux par défaut.'],
+  [/^An attribute named '(.*)' already exists$/, (name) => `Un attribut s’appelle déjà « ${name} ».`],
+  [/^Value '(.*)' of (.*) is used by variants and cannot be removed$/,
+    (value) => `La valeur « ${value} » est utilisée par des variantes : elle ne peut pas être retirée.`],
+  [/^A value of (.*) was just given to a variant/,
+    () => 'Une des valeurs retirées vient d’être donnée à une variante : rechargez et réessayez.'],
+  [/^Value '(.*)' appears twice$/, (value) => `La valeur « ${value} » apparaît deux fois.`],
+  [/^Value \d+ does not belong to attribute/, () => 'La liste des valeurs a changé entre-temps : rechargez la page.'],
+  [/^Two values cannot swap their names in one save/,
+    () => 'Deux valeurs ne peuvent pas échanger leurs noms en un seul enregistrement : renommez-en une, enregistrez, puis l’autre.'],
 ]
