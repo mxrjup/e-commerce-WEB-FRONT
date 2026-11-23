@@ -116,6 +116,26 @@ export type ProductRequest = {
 }
 
 export const productPath = (id: number) => `${PRODUCTS}/${id}`
+export const variantsPath = (productId: number) => `${productPath(productId)}/variants`
+export const variantPath = (id: number) => `/api/admin/catalog/variants/${id}`
+
+/**
+ * What POST /products/{id}/variants and PUT /variants/{id} take (C04).
+ * `initialStock` and `alertThreshold` are for a creation only: afterwards the
+ * stock moves through the inventory (C07, C20) and the paid orders (C21), and
+ * a PUT that sends them is refused.
+ */
+export type VariantRequest = {
+  sku: string
+  purchasePriceExclTax: number
+  salePriceExclTax: number
+  discountPriceExclTax: number | null
+  ecoTax: number | null
+  weightKg: number
+  valueIds: number[]
+  initialStock?: number
+  alertThreshold?: number
+}
 export const SPECIFICATION_KEYS = '/api/admin/catalog/specification-keys'
 
 /**
@@ -125,10 +145,20 @@ export const SPECIFICATION_KEYS = '/api/admin/catalog/specification-keys'
  * of a percent, so that no float error moves a cent: 0.1 + 0.2 is not 0.3.
  */
 export function unitPriceInclTax(variant: AdminVariant, ratePercent: number): number {
-  const cents = Math.round(((variant.discountPriceExclTax ?? variant.salePriceExclTax) + (variant.ecoTax ?? 0)) * 100)
+  return priceInclTax(variant.discountPriceExclTax ?? variant.salePriceExclTax, variant.ecoTax, ratePercent)
+}
+
+/** The same computation from the figures of a form, before the variant exists. */
+export function priceInclTax(currentExclTax: number, ecoTax: number | null, ratePercent: number): number {
+  const cents = Math.round((currentExclTax + (ecoTax ?? 0)) * 100)
   const rate = Math.round(ratePercent * 100)
   const vatCents = Math.floor((cents * rate + 5000) / 10000)
   return (cents + vatCents) / 100
+}
+
+/** What the shop earns on one unit, before VAT: the price it sells at, minus what it paid. Eco-tax aside: it is passed on. */
+export function marginExclTax(currentExclTax: number, purchaseExclTax: number): number {
+  return Math.round((currentExclTax - purchaseExclTax) * 100) / 100
 }
 
 export const STATUSES: readonly { status: ProductStatus; label: string }[] = [
