@@ -1,10 +1,14 @@
 import { screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import userEventLib from '@testing-library/user-event'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { routes } from '../../routes'
 import { fakeApi, on } from '../../test/fakeApi'
 import { fakeAuth, renderRoutes } from '../../test/renderWithAuth'
 import { PRODUCTS, unitPriceInclTax, type AdminVariant, type ProductDetail } from './api'
+
+// Sans delai entre les touches : ces tests remplissent toute une fiche, et les petits delais
+// s'additionnaient jusqu'a depasser le temps imparti sur une machine chargee.
+const userEvent = userEventLib.setup({ delay: null })
 
 const variant: AdminVariant = {
   id: 11, sku: 'LOGI-G915TKL-AZ-NOI', designation: 'Logitech G915 TKL - Noir, AZERTY',
@@ -54,6 +58,11 @@ async function choose(label: string, option: string) {
 }
 
 describe('the product form (C16)', () => {
+  // La fiche est chargee a part, avec son editeur : la charger une fois ici, hors du temps du premier test.
+  beforeAll(async () => {
+    await import('./ProductFormPage')
+  }, 60_000)
+
   afterEach(() => {
     vi.unstubAllGlobals()
     vi.restoreAllMocks()
@@ -88,8 +97,8 @@ describe('the product form (C16)', () => {
     await waitFor(() => expect(api.calls.some((call) => call.method === 'GET' && call.path === `${PRODUCTS}/42`)).toBe(true))
     expect(await screen.findByRole('heading', { name: 'Clavier Écho K2' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeDisabled()
-    // Long : il remplit toute la fiche, lettre par lettre, pendant que les autres fichiers de test tournent.
-  }, 15_000)
+    // Le plus long de la suite : une douzaine d'etapes, de la fiche vide jusqu'au produit recharge.
+  }, 30_000)
 
   it('says what is missing next to each field, without calling the API', async () => {
     const api = fakeApi(...references)

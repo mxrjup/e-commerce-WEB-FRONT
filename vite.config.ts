@@ -13,5 +13,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Les tests d'ecran tapent au clavier lettre par lettre dans jsdom : sur une machine chargee,
+    // ou avec toute la suite en parallele, les plus longs depassaient les 5 s par defaut.
+    testTimeout: 15_000,
   },
 })
