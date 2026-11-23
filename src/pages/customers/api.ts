@@ -44,10 +44,13 @@ export type CustomerOrder = {
 
 export type CustomerSpendSummary = {
   totalSpentInclTax: number
-  validOrderCount: number
-  cancelledOrderCount: number
+  paidOrderCount: number
+  excludedOrderCount: number
   averageBasketInclTax: number | null
 }
+
+/** Only paid orders count toward revenue/spend, matching the Statistics screen. */
+const PAID_ORDER_STATUSES = new Set(['IN_PREPARATION', 'SHIPPED', 'DELIVERED'])
 
 export function customersApi(api: Api) {
   return {
@@ -84,23 +87,23 @@ export function customerDisplayName(customer: Pick<Customer, 'firstName' | 'last
 
 export function summarizeCustomerOrders(orders: readonly CustomerOrder[]): CustomerSpendSummary {
   let totalSpentInclTax = 0
-  let validOrderCount = 0
-  let cancelledOrderCount = 0
+  let paidOrderCount = 0
+  let excludedOrderCount = 0
 
   for (const order of orders) {
-    if (order.status === 'CANCELLED') {
-      cancelledOrderCount += 1
+    if (!PAID_ORDER_STATUSES.has(order.status)) {
+      excludedOrderCount += 1
       continue
     }
-    validOrderCount += 1
+    paidOrderCount += 1
     totalSpentInclTax += Number(order.totalInclTax) || 0
   }
 
   return {
     totalSpentInclTax,
-    validOrderCount,
-    cancelledOrderCount,
-    averageBasketInclTax: validOrderCount > 0 ? totalSpentInclTax / validOrderCount : null,
+    paidOrderCount,
+    excludedOrderCount,
+    averageBasketInclTax: paidOrderCount > 0 ? totalSpentInclTax / paidOrderCount : null,
   }
 }
 

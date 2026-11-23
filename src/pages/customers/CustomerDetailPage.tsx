@@ -29,8 +29,9 @@ type LoadedCustomerDetail = {
 }
 
 /**
- * U09 (part 2): customer sheet with contact details, total spent (excluding
- * cancelled orders) and full order history from GET /api/admin/orders?userId={id}.
+ * U09 (part 2): customer sheet with contact details, total spent (paid orders
+ * only: IN_PREPARATION, SHIPPED, DELIVERED) and full order history from
+ * GET /api/admin/orders?userId={id}.
  */
 export function CustomerDetailPage() {
   const api = useApi()
@@ -175,15 +176,15 @@ export function CustomerDetailPage() {
               </Typography>
             )}
             <Typography variant="caption" color="text.secondary">
-              {summary.cancelledOrderCount > 0
-                ? `Hors ${summary.cancelledOrderCount} commande${summary.cancelledOrderCount > 1 ? 's' : ''} annulée${summary.cancelledOrderCount > 1 ? 's' : ''}`
-                : 'Toutes commandes validées confondues'}
+              {summary.excludedOrderCount > 0
+                ? `Hors ${summary.excludedOrderCount} commande${summary.excludedOrderCount > 1 ? 's' : ''} non payée${summary.excludedOrderCount > 1 ? 's' : ''} ou annulée${summary.excludedOrderCount > 1 ? 's' : ''}`
+                : 'Commandes payées uniquement'}
             </Typography>
           </Paper>
 
           <Paper variant="outlined" sx={{ p: 2.5, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <Typography variant="overline" color="text.secondary">
-              Commandes
+              Commandes payées
             </Typography>
             {loading && !data ? (
               <Skeleton width="50%" height={40} />
@@ -193,13 +194,13 @@ export function CustomerDetailPage() {
                 component="p"
                 sx={{ fontFamily: monoFont, fontWeight: 800, my: 1 }}
               >
-                {summary.validOrderCount}
+                {summary.paidOrderCount}
               </Typography>
             )}
             <Typography variant="caption" color="text.secondary">
               {summary.averageBasketInclTax !== null
                 ? `Panier moyen : ${formatPrice(summary.averageBasketInclTax)}`
-                : 'Aucune commande validée'}
+                : 'Aucune commande payée'}
             </Typography>
           </Paper>
         </Stack>

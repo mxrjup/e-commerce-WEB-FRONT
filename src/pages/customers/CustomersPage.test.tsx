@@ -83,6 +83,18 @@ const aliceOrders = [
     createdAt: '2026-11-04T09:00:00Z',
     items: [],
   },
+  {
+    id: 104,
+    orderNumber: 'CMD-2026-000104',
+    userId: 12,
+    status: 'NEW',
+    deliveryMode: 'STANDARD',
+    shippingAddressId: 1,
+    totalExclTax: 400,
+    totalInclTax: 480,
+    createdAt: '2026-11-05T11:00:00Z',
+    items: [],
+  },
 ]
 
 function pageOf<T>(content: T[]) {
@@ -115,7 +127,7 @@ describe('the customers screens (U09)', () => {
     expect(screen.queryByText('bob@log.test')).not.toBeInTheDocument()
   })
 
-  it('opens a customer sheet, shows total spent excluding cancelled orders, and expands order items', async () => {
+  it('opens a customer sheet, shows total spent for paid orders only, and expands order items', async () => {
     fakeApi(
       on('GET', '/api/admin/users?page=0&size=20', 200, pageOf([alice, bob])),
       on('GET', '/api/admin/orders?userId=12', 200, aliceOrders),
@@ -126,14 +138,15 @@ describe('the customers screens (U09)', () => {
 
     expect(await screen.findByRole('heading', { name: 'Alice Bernard' })).toBeInTheDocument()
     expect(screen.getByText(/180,00\s€/)).toBeInTheDocument()
-    expect(screen.getByText('Hors 1 commande annulée')).toBeInTheDocument()
+    expect(screen.getByText('Hors 2 commandes non payées ou annulées')).toBeInTheDocument()
     expect(screen.getByText(/Panier moyen : 90,00\s€/)).toBeInTheDocument()
 
     const historyTable = screen.getByRole('table', { name: 'Historique des commandes du client' })
     const rows = within(historyTable).getAllByRole('row')
-    expect(rows[1]).toHaveTextContent('CMD-2026-000103')
-    expect(rows[2]).toHaveTextContent('CMD-2026-000102')
-    expect(rows[3]).toHaveTextContent('CMD-2026-000101')
+    expect(rows[1]).toHaveTextContent('CMD-2026-000104')
+    expect(rows[2]).toHaveTextContent('CMD-2026-000103')
+    expect(rows[3]).toHaveTextContent('CMD-2026-000102')
+    expect(rows[4]).toHaveTextContent('CMD-2026-000101')
 
     await userEvent.click(screen.getByRole('button', { name: 'Afficher les articles de la commande CMD-2026-000102' }))
     expect(await screen.findByText('Clavier mécanique compact')).toBeInTheDocument()
@@ -152,11 +165,11 @@ describe('the customers screens (U09)', () => {
 })
 
 describe('summarizeCustomerOrders', () => {
-  it('computes total spent and average basket without cancelled orders', () => {
+  it('computes total spent and average basket from paid orders only', () => {
     const summary = summarizeCustomerOrders(aliceOrders)
     expect(summary.totalSpentInclTax).toBe(180)
-    expect(summary.validOrderCount).toBe(2)
-    expect(summary.cancelledOrderCount).toBe(1)
+    expect(summary.paidOrderCount).toBe(2)
+    expect(summary.excludedOrderCount).toBe(2)
     expect(summary.averageBasketInclTax).toBe(90)
   })
 })
