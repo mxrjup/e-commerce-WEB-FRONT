@@ -140,7 +140,7 @@ describe('the variants of a product (C17)', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Modifier Noir, AZERTY' }))
     const dialog = await screen.findByRole('dialog', { name: 'Modifier CLAVIER-K2-NOIR-AZERTY' })
-    expect(within(dialog).getByText(/se modifient depuis l’inventaire/)).toBeInTheDocument()
+    expect(within(dialog).getByRole('link', { name: 'l’inventaire' })).toHaveAttribute('href', '/inventory?q=CLAVIER-K2-NOIR-AZERTY')
     expect(within(dialog).queryByRole('textbox', { name: 'Stock de départ' })).not.toBeInTheDocument()
     const sale = within(dialog).getByRole('textbox', { name: 'Prix de vente HT' })
     expect(sale).toHaveValue('89,9')
