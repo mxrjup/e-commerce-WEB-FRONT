@@ -1,17 +1,17 @@
 import AddOutlined from '@mui/icons-material/AddOutlined'
 import ClearOutlined from '@mui/icons-material/ClearOutlined'
-import SearchOutlined from '@mui/icons-material/SearchOutlined'
 import {
-  Box, Button, Chip, InputAdornment, Link, MenuItem, Stack, TableCell, TablePagination, TableRow, TableSortLabel, TextField,
+  Box, Button, Chip, Link, MenuItem, Stack, TableCell, TablePagination, TableRow, TableSortLabel, TextField,
   Typography,
 } from '@mui/material'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Link as RouterLink, useSearchParams } from 'react-router'
 import { errorMessage } from '../../api/errors'
 import { useApi } from '../../api/useApi'
 import { useList } from '../../api/useList'
 import { useLoad } from '../../api/useLoad'
 import { PageHeader } from '../../components/PageHeader'
+import { SearchField } from '../../components/SearchField'
 import { StatusBadge } from '../../components/StatusBadge'
 import { TableFrame } from '../../components/TableFrame'
 import { formatDateTime, formatPrice } from '../../lib/format'
@@ -69,7 +69,7 @@ export function ProductsPage() {
         <StatusChips query={query} onChange={(status) => change({ status })} />
 
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} useFlexGap sx={{ flexWrap: 'wrap' }}>
-          <SearchField value={query.search} onChange={(search) => change({ search }, true)} />
+          <SearchField value={query.search} onChange={(search) => change({ search }, true)} placeholder="Titre, slug ou SKU" />
           <TextField
             select
             size="small"
@@ -193,38 +193,6 @@ function StatusChips({ query, onChange }: { query: ProductQuery; onChange: (stat
         )
       })}
     </Stack>
-  )
-}
-
-/** Searches as the user types, once they pause: one request per word, not per letter. */
-function SearchField({ value, onChange }: { value: string; onChange: (value: string) => void }) {
-  const [text, setText] = useState(value)
-  // Le bouton retour change la recherche de l'adresse : le champ la suit.
-  const [shown, setShown] = useState(value)
-  if (value !== shown) {
-    setShown(value)
-    setText(value)
-  }
-
-  useEffect(() => {
-    if (text.trim() === value.trim()) return
-    const timer = setTimeout(() => onChange(text), 300)
-    return () => clearTimeout(timer)
-  }, [text, value, onChange])
-
-  return (
-    <TextField
-      size="small"
-      label="Rechercher"
-      placeholder="Titre, slug ou SKU"
-      value={text}
-      onChange={(event) => setText(event.target.value)}
-      sx={{ width: { xs: '100%', md: 300 } }}
-      slotProps={{
-        htmlInput: { maxLength: 150 },
-        input: { startAdornment: <InputAdornment position="start"><SearchOutlined fontSize="small" /></InputAdornment> },
-      }}
-    />
   )
 }
 
