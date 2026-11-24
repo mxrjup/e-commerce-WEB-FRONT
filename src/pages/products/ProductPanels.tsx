@@ -1,9 +1,7 @@
-import { Alert, Button, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { Alert, Button, Paper, Stack, Typography } from '@mui/material'
 import type { ReactNode } from 'react'
 import { StatusBadge } from '../../components/StatusBadge'
-import { formatPrice } from '../../lib/format'
-import { monoFont } from '../../theme'
-import { statusLabel, unitPriceInclTax, type ProductDetail, type ProductStatus } from './api'
+import { statusLabel, type ProductDetail, type ProductStatus } from './api'
 
 export function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -73,59 +71,6 @@ export function StatusPanel({ product, dirty, busy, onStatus, onDelete }: {
           )}
         </Stack>
       </Stack>
-    </Panel>
-  )
-}
-
-/**
- * The variants of the product, read-only: what is sold, at what price and
- * with what stock. The price including VAT uses the rate chosen in the form,
- * so changing the rate shows its effect before saving.
- */
-export function VariantsPanel({ product, ratePercent }: { product: ProductDetail | null; ratePercent: number | null }) {
-  const variants = product?.variants ?? []
-  return (
-    <Panel title="Variantes">
-      {variants.length === 0
-        ? (
-          <Typography variant="body2" color="text.secondary">
-            {product ? 'Aucune variante pour l’instant.' : 'Les variantes s’ajoutent une fois le produit créé.'}
-          </Typography>
-        )
-        : (
-          <Table size="small" aria-label="Variantes" sx={{ '& td, & th': { px: 1 } }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Variante</TableCell>
-                <TableCell align="right">HT</TableCell>
-                <TableCell align="right">TTC</TableCell>
-                <TableCell align="right">Stock</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {variants.map((variant) => {
-                const values = variant.values.map((value) => value.value).join(', ')
-                const current = variant.discountPriceExclTax ?? variant.salePriceExclTax
-                return (
-                  <TableRow key={variant.id}>
-                    <TableCell component="th" scope="row">
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{values || 'Variante unique'}</Typography>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontFamily: monoFont }}>{variant.sku}</Typography>
-                    </TableCell>
-                    <TableCell align="right" sx={{ fontFamily: monoFont, whiteSpace: 'nowrap' }}>{formatPrice(current)}</TableCell>
-                    <TableCell align="right" sx={{ fontFamily: monoFont, whiteSpace: 'nowrap' }}>
-                      {ratePercent === null ? '—' : formatPrice(unitPriceInclTax(variant, ratePercent))}
-                    </TableCell>
-                    <TableCell align="right" sx={{ fontFamily: monoFont, fontWeight: variant.lowStock ? 600 : 500 }}>{variant.stock}</TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        )}
-      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5 }}>
-        TTC : écotaxe et TVA comprises, pour une unité. L’ajout et la modification des variantes arrivent avec C17.
-      </Typography>
     </Panel>
   )
 }

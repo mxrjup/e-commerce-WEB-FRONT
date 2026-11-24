@@ -20,11 +20,12 @@ import { NotFoundPage } from '../NotFoundPage'
 import { PATHS, type Brand, type Category, type Universe, type VatRate } from '../references/api'
 import { categoryTree } from '../references/categoryTree'
 import { PRODUCTS, productPath, type ProductDetail, type ProductStatus } from './api'
-import { Panel, StatusPanel, VariantsPanel } from './ProductPanels'
+import { Panel, StatusPanel } from './ProductPanels'
 import {
   emptyForm, formOf, hasProductErrors, LIMITS, requestOf, sameForm, translations, validate, type ProductForm,
 } from './productForm'
 import { SpecificationsField } from './SpecificationsField'
+import { VariantsSection } from './VariantsSection'
 
 type References = { brands: Brand[]; categories: Category[]; universes: Universe[]; vatRates: VatRate[] }
 
@@ -155,6 +156,16 @@ function ProductEditor({ initial, references }: { initial: ProductDetail | null;
     }
   }
 
+  /** After a change of its variants: their list and the status panel depend on them, the sheet being typed does not. */
+  const refreshProduct = useCallback(async () => {
+    if (!product) return
+    try {
+      setProduct(await api<ProductDetail>(productPath(product.id)))
+    } catch (e) {
+      setError(errorMessage(e, translations))
+    }
+  }, [api, product])
+
   async function changeStatus(status: ProductStatus) {
     if (!product) return
     setBusy(true)
@@ -243,6 +254,7 @@ function ProductEditor({ initial, references }: { initial: ProductDetail | null;
                 errors={errors}
               />
             </Paper>
+            <VariantsSection product={product} ratePercent={rate} onChanged={refreshProduct} />
           </Stack>
         </Grid>
 
@@ -310,7 +322,6 @@ function ProductEditor({ initial, references }: { initial: ProductDetail | null;
                 />
               </Stack>
             </Panel>
-            <VariantsPanel product={product} ratePercent={rate} />
           </Stack>
         </Grid>
       </Grid>

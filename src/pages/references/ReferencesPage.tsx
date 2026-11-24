@@ -1,6 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material'
 import { useSearchParams } from 'react-router'
 import { PageHeader } from '../../components/PageHeader'
+import { AttributesTab } from './AttributesTab'
 import { BrandsTab } from './BrandsTab'
 import { CategoriesTab } from './CategoriesTab'
 import { UniversesTab } from './UniversesTab'
@@ -11,6 +12,7 @@ const TABS = [
   { key: 'categories', label: 'Catégories', panel: <CategoriesTab /> },
   { key: 'univers', label: 'Univers', panel: <UniversesTab /> },
   { key: 'tva', label: 'TVA', panel: <VatRatesTab /> },
+  { key: 'attributs', label: 'Attributs', panel: <AttributesTab /> },
 ] as const
 
 /**
@@ -25,7 +27,7 @@ export function ReferencesPage() {
     <>
       <PageHeader
         title="Référentiels"
-        description="Les marques, catégories, univers et taux de TVA proposés dans les fiches produit."
+        description="Les marques, catégories, univers, taux de TVA et attributs proposés dans les fiches produit."
       />
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs
