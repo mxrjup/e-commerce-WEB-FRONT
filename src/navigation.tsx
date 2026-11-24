@@ -12,6 +12,8 @@ import SupportAgentOutlined from '@mui/icons-material/SupportAgentOutlined'
 import type { ReactNode } from 'react'
 import { hasAnyRole, type Role } from './auth/roles'
 import { CollaboratorsPage } from './pages/collaborators/CollaboratorsPage'
+import { CustomerDetailPage } from './pages/customers/CustomerDetailPage'
+import { CustomersPage } from './pages/customers/CustomersPage'
 import { HomePage } from './pages/HomePage'
 import { McpPage } from './pages/mcp/McpPage'
 import { LazyProductFormPage } from './pages/products/LazyProductFormPage'
@@ -65,7 +67,10 @@ export const navigation: NavSection[] = [
     title: 'Ventes',
     items: [
       { path: '/orders', label: 'Commandes', icon: <LocalShippingOutlined />, task: { id: 'O13', issue: 37, owner: 'YoanBst' } },
-      { path: '/customers', label: 'Clients', icon: <PeopleOutlined />, task: { id: 'U09', issue: 74, owner: null } },
+      {
+        path: '/customers', label: 'Clients', icon: <PeopleOutlined />, element: <CustomersPage />,
+        pages: [{ path: '/customers/:id', element: <CustomerDetailPage /> }],
+      },
       { path: '/support', label: 'SAV', icon: <SupportAgentOutlined />, task: { id: 'S05', issue: 75, owner: null } },
       { path: '/statistics', label: 'Statistiques', icon: <InsightsOutlined />, element: <LazyStatisticsPage /> },
     ],
