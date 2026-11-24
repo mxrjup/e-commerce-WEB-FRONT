@@ -21,6 +21,8 @@ import { ProductsPage } from './pages/products/ProductsPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { LazyStatisticsPage } from './pages/statistics/LazyStatisticsPage'
+import { SupportTicketDetailPage } from './pages/support/SupportTicketDetailPage'
+import { SupportTicketsPage } from './pages/support/SupportTicketsPage'
 
 /**
  * Every page of the back-office, in one place: the menu, the routes and the
@@ -71,7 +73,10 @@ export const navigation: NavSection[] = [
         path: '/customers', label: 'Clients', icon: <PeopleOutlined />, element: <CustomersPage />,
         pages: [{ path: '/customers/:id', element: <CustomerDetailPage /> }],
       },
-      { path: '/support', label: 'SAV', icon: <SupportAgentOutlined />, task: { id: 'S05', issue: 75, owner: null } },
+      {
+        path: '/support', label: 'SAV', icon: <SupportAgentOutlined />, element: <SupportTicketsPage />,
+        pages: [{ path: '/support/:id', element: <SupportTicketDetailPage /> }],
+      },
       { path: '/statistics', label: 'Statistiques', icon: <InsightsOutlined />, element: <LazyStatisticsPage /> },
     ],
   },
