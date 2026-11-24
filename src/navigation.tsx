@@ -15,6 +15,7 @@ import { CollaboratorsPage } from './pages/collaborators/CollaboratorsPage'
 import { CustomerDetailPage } from './pages/customers/CustomerDetailPage'
 import { CustomersPage } from './pages/customers/CustomersPage'
 import { HomePage } from './pages/HomePage'
+import { InventoryPage } from './pages/inventory/InventoryPage'
 import { McpPage } from './pages/mcp/McpPage'
 import { LazyProductFormPage } from './pages/products/LazyProductFormPage'
 import { ProductsPage } from './pages/products/ProductsPage'
@@ -59,7 +60,7 @@ export const navigation: NavSection[] = [
         // Une seule route pour creer et modifier : apres une creation, seule la fiche se recharge.
         pages: [{ path: '/products/:id', element: <LazyProductFormPage /> }],
       },
-      { path: '/inventory', label: 'Inventaire', icon: <Inventory2Outlined />, task: { id: 'C20', issue: 16, owner: 'wassim-png' } },
+      { path: '/inventory', label: 'Inventaire', icon: <Inventory2Outlined />, element: <InventoryPage /> },
       { path: '/references', label: 'Référentiels', icon: <CategoryOutlined />, element: <ReferencesPage /> },
     ],
   },

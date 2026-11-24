@@ -137,8 +137,9 @@ export function VariantDialog({ product, attributes, editing, ratePercent, onClo
       {editing
         ? (
           <Typography variant="body2" color="text.secondary">
-            Stock : <strong>{editing.stock}</strong>, seuil d’alerte : {editing.alertThreshold}. Ils se modifient depuis l’inventaire,
-            pour ne jamais effacer une vente faite pendant que ce formulaire est ouvert.
+            Stock : <strong>{editing.stock}</strong>, seuil d’alerte : {editing.alertThreshold}. Ils se modifient depuis{' '}
+            <Link href={`/inventory?q=${encodeURIComponent(editing.sku)}`} target="_blank" rel="noopener">l’inventaire</Link>
+            {' '}(nouvel onglet), pour ne jamais effacer une vente faite pendant que ce formulaire est ouvert.
           </Typography>
         )
         : (

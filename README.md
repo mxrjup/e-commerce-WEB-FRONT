@@ -80,6 +80,7 @@ Avant d'écrire un composant, vérifier qu'il n'existe pas déjà :
 |---|---|
 | Appeler l'API sans recharger l'écran à chaque renouvellement du jeton | `useApi()` (`src/api/useApi.ts`) |
 | Charger une liste, la recharger après une modification | `useList()` (`src/api/useList.ts`) |
+| Une recherche envoyée quand on arrête de taper, qui suit l'adresse | `SearchField` |
 | Charger autre chose qu'une liste (une page de résultats), à chaque changement de filtre, en ignorant une réponse arrivée trop tard | `useLoad()` (`src/api/useLoad.ts`), sur lequel repose `useList()` |
 | Dire une erreur d'API en français | `errorMessage()` (`src/api/errors.ts`) |
 | Titre d'écran et action principale | `PageHeader` |
@@ -139,6 +140,17 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
   cochées, avec un SKU proposé (`CLAVIER-K2-NOIR-AZERTY`) et un prix commun ;
   l'API n'ayant pas de création groupée, elles sont créées une par une et les
   refus sont listés avec leur raison. 50 combinaisons au plus à la fois.
+- **Inventaire** (`/inventory`, `C20`) : le stock exact de chaque variante,
+  tous statuts de produit confondus, sur l'API de stock de `catalog-service`
+  (`C07`). Un bandeau compte les variantes à ou sous leur seuil, une puce les
+  liste seules ; recherche par titre ou SKU, pagination côté serveur, filtres
+  dans l'adresse (`/inventory?alertes=oui&q=g915`). « Ajuster le stock »
+  envoie un **écart** (entrée ou sortie), jamais un stock final : une commande
+  payée pendant que la fenêtre est ouverte garde sa vente ; une sortie plus
+  grande que le stock est refusée avant l'envoi, et par le service si le stock
+  a baissé entre-temps (la liste se recharge alors). Le seuil d'alerte se
+  modifie à part. Pas d'historique des mouvements : le service ne garde que le
+  niveau actuel.
 - **Référentiels** (`src/pages/references/`, `C19`, `C17`) : marques,
   catégories (en arbre), univers, taux de TVA et attributs avec leurs valeurs
   (renommer une valeur la garde sur ses variantes ; une valeur utilisée ne se
