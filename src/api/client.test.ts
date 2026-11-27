@@ -35,6 +35,19 @@ describe('apiFetch', () => {
     expect(new Headers(fetch.mock.calls[0][1].headers).get('Content-Type')).toBe('application/json')
   })
 
+  it('lets the browser type a file upload itself', async () => {
+    const fetch = answer(201, {})
+    vi.stubGlobal('fetch', fetch)
+    const form = new FormData()
+    form.append('file', new File(['x'], 'photo.jpg', { type: 'image/jpeg' }))
+
+    await apiFetch(getToken, '/api/x', { method: 'POST', body: form })
+
+    // Le navigateur ajoute « multipart/form-data; boundary=... » : un type pose a la main le casserait.
+    expect(new Headers(fetch.mock.calls[0][1].headers).has('Content-Type')).toBe(false)
+    expect(fetch.mock.calls[0][1].body).toBe(form)
+  })
+
   it('turns the shared error contract into an ApiError', async () => {
     vi.stubGlobal('fetch', answer(409, {
       status: 409, error: 'Conflict', message: 'Variant 5 does not have enough stock', details: ['delta'],

@@ -2,6 +2,8 @@ import AddOutlined from '@mui/icons-material/AddOutlined'
 import AutoAwesomeMotionOutlined from '@mui/icons-material/AutoAwesomeMotionOutlined'
 import DeleteOutlined from '@mui/icons-material/DeleteOutlined'
 import EditOutlined from '@mui/icons-material/EditOutlined'
+import ImageOutlined from '@mui/icons-material/ImageOutlined'
+import PhotoLibraryOutlined from '@mui/icons-material/PhotoLibraryOutlined'
 import {
   Box, Button, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography,
 } from '@mui/material'
@@ -13,16 +15,17 @@ import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { useNotify } from '../../components/Notifications'
 import { StatusBadge } from '../../components/StatusBadge'
 import { formatPrice } from '../../lib/format'
-import { monoFont } from '../../theme'
+import { monoFont, tokens } from '../../theme'
 import { PATHS, type Attribute } from '../references/api'
 import { marginExclTax, unitPriceInclTax, variantPath, type AdminVariant, type ProductDetail } from './api'
 import { GenerateVariantsDialog } from './GenerateVariantsDialog'
 import { VariantDialog } from './VariantDialog'
+import { VariantImagesDialog } from './VariantImagesDialog'
 import { variantTranslations } from './variantForm'
 
 const mono = { fontFamily: monoFont, whiteSpace: 'nowrap' } as const
 
-type Editor = { kind: 'add' } | { kind: 'edit'; variant: AdminVariant } | { kind: 'generate' } | null
+type Editor = { kind: 'add' } | { kind: 'edit'; variant: AdminVariant } | { kind: 'images'; variant: AdminVariant; title: string } | { kind: 'generate' } | null
 
 /**
  * The variants of a product (C17): what is actually sold, with its prices,
@@ -93,9 +96,10 @@ export function VariantsSection({ product, ratePercent, onChanged }: {
         ? <Typography variant="body2" color="text.secondary">Aucune variante pour l’instant : sans variante, le produit n’a ni prix ni stock, et ne peut pas être publié.</Typography>
         : (
           <TableContainer>
-            <Table size="small" aria-label="Variantes" sx={{ minWidth: 720 }}>
+            <Table size="small" aria-label="Variantes" sx={{ minWidth: 800 }}>
               <TableHead>
                 <TableRow>
+                  <TableCell sx={{ width: 64 }}>Photo</TableCell>
                   <TableCell>Variante</TableCell>
                   <TableCell align="right">Prix HT</TableCell>
                   <TableCell align="right">TTC</TableCell>
@@ -111,6 +115,9 @@ export function VariantsSection({ product, ratePercent, onChanged }: {
                   const name = values || variant.sku
                   return (
                     <TableRow key={variant.id} hover>
+                      <TableCell sx={{ py: 1 }}>
+                        <Thumbnail variant={variant} />
+                      </TableCell>
                       <TableCell component="th" scope="row">
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>{values || 'Variante unique'}</Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ fontFamily: monoFont }}>{variant.sku}</Typography>
@@ -134,6 +141,9 @@ export function VariantsSection({ product, ratePercent, onChanged }: {
                         </Stack>
                       </TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        <Tooltip title="Photos">
+                          <IconButton aria-label={`Photos de ${name}`} onClick={() => setEditor({ kind: 'images', variant, title: name })}><PhotoLibraryOutlined /></IconButton>
+                        </Tooltip>
                         <Tooltip title="Modifier">
                           <IconButton aria-label={`Modifier ${name}`} onClick={() => setEditor({ kind: 'edit', variant })}><EditOutlined /></IconButton>
                         </Tooltip>
@@ -175,6 +185,16 @@ export function VariantsSection({ product, ratePercent, onChanged }: {
           onSaved={(message) => void saved(message)}
         />
       )}
+      {editor?.kind === 'images' && (
+        <VariantImagesDialog
+          variant={editor.variant}
+          title={editor.title}
+          onClose={(changed) => {
+            setEditor(null)
+            if (changed) void onChanged()
+          }}
+        />
+      )}
       {editor?.kind === 'generate' && attributes.items && (
         <GenerateVariantsDialog
           product={product}
@@ -210,5 +230,26 @@ function Section({ actions, children }: { actions?: ReactNode; children: ReactNo
       </Stack>
       {children}
     </Paper>
+  )
+}
+
+/** The main photo of a variant, small, with how many it has; an empty frame without any. */
+function Thumbnail({ variant }: { variant: AdminVariant }) {
+  const main = variant.images[0]
+  return (
+    <Box sx={{ position: 'relative', width: 48, height: 48 }}>
+      {main
+        ? <Box component="img" src={main.url} alt="" sx={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 1, border: `1px solid ${tokens.line}`, bgcolor: tokens.canvasWarm }} />
+        : (
+          <Box sx={{ width: 48, height: 48, borderRadius: 1, border: `1px dashed ${tokens.lineStrong}`, display: 'grid', placeItems: 'center' }}>
+            <ImageOutlined fontSize="small" sx={{ color: tokens.ink3 }} aria-label="Aucune photo" />
+          </Box>
+        )}
+      {variant.images.length > 1 && (
+        <Box component="span" aria-label={`${variant.images.length} photos`} sx={{ position: 'absolute', right: -6, bottom: -6, bgcolor: tokens.ink, color: tokens.onDark, borderRadius: 999, px: 0.75, fontSize: 11, fontFamily: monoFont }}>
+          {variant.images.length}
+        </Box>
+      )}
+    </Box>
   )
 }

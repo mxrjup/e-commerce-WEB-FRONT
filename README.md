@@ -140,6 +140,16 @@ alignés à droite dans une colonne. Pour tester un écran sans la pile
   cochées, avec un SKU proposé (`CLAVIER-K2-NOIR-AZERTY`) et un prix commun ;
   l'API n'ayant pas de création groupée, elles sont créées une par une et les
   refus sont listés avec leur raison. 50 combinaisons au plus à la fois.
+- **Photos d'une variante** (bouton photos de chaque ligne de variante, `C18`),
+  sur l'API d'images de `catalog-service` (`C06`) : on les glisse dans la
+  fenêtre, on les choisit, ou on les colle avec Ctrl+V (« Copier l'image »
+  sur n'importe quel site). Format, taille (5 Mo) et nombre (10 par variante)
+  sont vérifiés avant l'envoi, le service revérifie le contenu du fichier.
+  Les photos partent une par une ; on les réordonne en les faisant glisser
+  (ou avec les flèches, au clavier), la première est la miniature principale,
+  dans la liste des variantes comme en vitrine. Un lien collé n'est pas
+  téléchargé : le navigateur ne peut pas lire une image d'un autre site, et
+  faire télécharger une adresse quelconque par le serveur serait une faille.
 - **Inventaire** (`/inventory`, `C20`) : le stock exact de chaque variante,
   tous statuts de produit confondus, sur l'API de stock de `catalog-service`
   (`C07`). Un bandeau compte les variantes à ou sous leur seuil, une puce les

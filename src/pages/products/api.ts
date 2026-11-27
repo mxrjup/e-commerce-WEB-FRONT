@@ -119,6 +119,18 @@ export const productPath = (id: number) => `${PRODUCTS}/${id}`
 export const variantsPath = (productId: number) => `${productPath(productId)}/variants`
 export const variantPath = (id: number) => `/api/admin/catalog/variants/${id}`
 
+/** The photos of a variant (C06): upload one (multipart, field `file`), delete one, or send the new order. */
+export const imagesPath = (variantId: number) => `${variantPath(variantId)}/images`
+export const imagePath = (variantId: number, imageId: number) => `${imagesPath(variantId)}/${imageId}`
+export const imagesOrderPath = (variantId: number) => `${imagesPath(variantId)}/order`
+
+/** The same limits as catalog-service, checked before sending anything. */
+export const IMAGES = {
+  types: ['image/jpeg', 'image/png', 'image/webp'],
+  maxBytes: 5 * 1024 * 1024,
+  maxPerVariant: 10,
+} as const
+
 /**
  * What POST /products/{id}/variants and PUT /variants/{id} take (C04).
  * `initialStock` and `alertThreshold` are for a creation only: afterwards the
