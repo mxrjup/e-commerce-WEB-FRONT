@@ -23,13 +23,12 @@ describe('the back-office', () => {
     expect(screen.getByText('Collaborateur')).toBeInTheDocument()
   })
 
-  it('shows the task and its owner on a screen not delivered yet', async () => {
+  it('opens the delivered orders screen', async () => {
+    fakeApi(() => ({ status: 200, body: [] }))
     renderRoutes(routes(), '/orders', fakeAuth(['collaborator']))
 
     expect(await screen.findByRole('heading', { name: 'Commandes' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'O13 (#37)' }))
-      .toHaveAttribute('href', 'https://github.com/mxrjup/e-commerce-BACK/issues/37')
-    expect(screen.getByText(/YoanBst/)).toBeInTheDocument()
+    expect(await screen.findByText('Aucune commande pour ce filtre.')).toBeInTheDocument()
   })
 
   it('refuses an admin page to a collaborator who types its address', async () => {
