@@ -33,7 +33,8 @@ export async function apiFetch<T>(
   const headers = new Headers(init.headers)
   headers.set('Authorization', `Bearer ${await getToken()}`)
   headers.set('Accept', 'application/json')
-  if (init.body !== undefined && !headers.has('Content-Type')) {
+  // Un fichier (FormData) garde le type que le navigateur pose lui-meme, avec sa frontiere multipart.
+  if (init.body !== undefined && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
 
