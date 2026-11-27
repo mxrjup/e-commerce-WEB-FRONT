@@ -20,6 +20,8 @@ import { McpPage } from './pages/mcp/McpPage'
 import { LazyProductFormPage } from './pages/products/LazyProductFormPage'
 import { ProductsPage } from './pages/products/ProductsPage'
 import { ReferencesPage } from './pages/references/ReferencesPage'
+import { OrderDetailPage } from './pages/orders/OrderDetailPage'
+import { OrdersPage } from './pages/orders/OrdersPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { LazyStatisticsPage } from './pages/statistics/LazyStatisticsPage'
 import { SupportTicketDetailPage } from './pages/support/SupportTicketDetailPage'
@@ -69,7 +71,9 @@ export const navigation: NavSection[] = [
   {
     title: 'Ventes',
     items: [
-      { path: '/orders', label: 'Commandes', icon: <LocalShippingOutlined />, task: { id: 'O13', issue: 37, owner: 'YoanBst' } },
+      { path: '/orders', label: 'Commandes', icon: <LocalShippingOutlined />, element: <OrdersPage />,
+        pages: [{ path: '/orders/:id', element: <OrderDetailPage /> }],
+      },
       {
         path: '/customers', label: 'Clients', icon: <PeopleOutlined />, element: <CustomersPage />,
         pages: [{ path: '/customers/:id', element: <CustomerDetailPage /> }],
