@@ -127,7 +127,7 @@ export function OrderDetailPage() {
                       <TableCell sx={{ fontWeight: 600 }}>{item.designation}</TableCell>
                       <TableCell sx={{ fontFamily: monoFont }}>#{item.variantId}</TableCell>
                       <TableCell align="right" sx={{ fontFamily: monoFont }}>{formatPrice(item.unitPriceExclTax)}</TableCell>
-                      <TableCell align="right">{formatPercent(item.vatRate * 100)}</TableCell>
+                      <TableCell align="right">{formatPercent(item.vatRate)}</TableCell>
                       <TableCell align="right" sx={{ fontFamily: monoFont }}>{item.quantity}</TableCell>
                       <TableCell align="right" sx={{ fontFamily: monoFont, fontWeight: 700 }}>{formatPrice(item.subTotalInclTax)}</TableCell>
                     </TableRow>

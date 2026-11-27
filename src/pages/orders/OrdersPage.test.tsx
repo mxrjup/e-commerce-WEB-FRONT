@@ -24,7 +24,7 @@ const orders = [
         variantId: 4,
         designation: 'Clavier mécanique — Noir',
         unitPriceExclTax: 83.3333,
-        vatRate: 0.2,
+        vatRate: 20,
         quantity: 1,
         subTotalExclTax: 83.3333,
         subTotalInclTax: 100,
@@ -80,6 +80,7 @@ describe('O13 — back-office des commandes', () => {
     expect(screen.getByText('Clavier mécanique — Noir')).toBeInTheDocument()
     expect(screen.getByText('#4')).toBeInTheDocument()
     expect(screen.getByText('120,00 €')).toBeInTheDocument()
+    expect(screen.getByText('20,00 %')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('link', { name: 'Commandes' }))
     expect(await screen.findByRole('heading', { name: 'Commandes' })).toBeInTheDocument()
