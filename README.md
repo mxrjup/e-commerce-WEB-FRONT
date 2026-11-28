@@ -100,6 +100,28 @@ Les nombres, slugs et identifiants s'écrivent en `monoFont` (JetBrains Mono),
 alignés à droite dans une colonne. Pour tester un écran sans la pile
 `e-commerce-BACK`, `fakeApi()` (`src/test/fakeApi.ts`) remplace la gateway.
 
+## Déploiement
+
+L'image se construit avec le `Dockerfile` : build Vite, puis nginx sans root
+(`nginx-unprivileged`, port 8080, système de fichiers en lecture seule
+possible). Elle vise **Keycloak et la gateway sur le même hôte qu'elle**
+(`VITE_KEYCLOAK_URL=/auth`, `VITE_API_URL=/`) : derrière l'Ingress de
+`e-commerce-INFRA`, `/api` va à la gateway, `/auth` à Keycloak et tout le
+reste au back-office. Une même image sert donc tout hôte public. Une valeur
+`VITE_*` qui commence par `/` est un chemin sur l'hôte de la page
+(`src/config.ts`).
+
+| Workflow | Déclencheur | Effet |
+|---|---|---|
+| `CI` | PR et push sur `dev`/`main` | lint, tests, build |
+| `Images` | PR (sans push), push sur `dev`/`main`, tag `v*` | image `ghcr.io/mxrjup/e-commerce-web-front` taggée par SHA, branche et version |
+| `Deploy` | fin d'`Images` sur un tag `vX.Y.Z` de `main`, ou lancement manuel | le Deployment `web-backoffice` passe sur le digest de la version ; retour arrière si le rollout échoue |
+
+Prérequis : l'environnement GitHub `production` avec le secret `KUBECONFIG`
+(comme pour le back-end), et le Deployment `web-backoffice` sur le cluster
+(`e-commerce-INFRA`, `k8s/services/web-backoffice.yaml`). Comme pour tout
+workflow `workflow_run`, `Deploy` ne s'exécute qu'une fois présent sur `main`.
+
 ## Ce qui est en place
 
 - **Connexion** (`src/auth/AuthProvider.tsx`) : flux *authorization code* avec

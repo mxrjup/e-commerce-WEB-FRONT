@@ -1,0 +1,40 @@
+# Lint, tests et build du back-office a chaque Pull Request et a chaque merge
+# sur dev ou main. C'est le job « CI » qu'il faut rendre obligatoire dans la
+# protection des branches.
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      # Le build de l'image : Keycloak et la gateway sur le meme hote.
+      - run: npm run build
+        env:
+          VITE_API_URL: /
+          VITE_KEYCLOAK_URL: /auth
