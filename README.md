@@ -122,6 +122,10 @@ Prérequis : l'environnement GitHub `production` avec le secret `KUBECONFIG`
 (`e-commerce-INFRA`, `k8s/services/web-backoffice.yaml`). Comme pour tout
 workflow `workflow_run`, `Deploy` ne s'exécute qu'une fois présent sur `main`.
 
+L'image sert aussi `/checkout/success` et `/checkout/cancel` : les pages de
+retour Stripe de l'application mobile (`docker/checkout/`). Stripe exige une
+page HTTPS ; elle renvoie dans l'application par `ecommerce://checkout-...`.
+
 ## Ce qui est en place
 
 - **Connexion** (`src/auth/AuthProvider.tsx`) : flux *authorization code* avec
