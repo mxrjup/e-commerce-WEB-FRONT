@@ -175,7 +175,7 @@ export function VariantsSection({ product, ratePercent, onChanged }: {
         {!draft && ' Le stock se modifie depuis l’inventaire.'}
       </Typography>
 
-      {editor && editor.kind !== 'generate' && attributes.items && (
+      {(editor?.kind === 'add' || editor?.kind === 'edit') && attributes.items && (
         <VariantDialog
           product={product}
           attributes={attributes.items}

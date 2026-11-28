@@ -73,6 +73,16 @@ describe('the photos of a variant (C18)', () => {
     expect(photos[0].querySelector('img')).toHaveAttribute('src', front.url)
   })
 
+  it('opens the photos alone, without an empty variant form behind', async () => {
+    fakeApi(...references)
+    await openPhotos()
+
+    // hidden: true, car MUI masque aux lecteurs d'ecran une fenetre recouverte par une autre.
+    expect(screen.getAllByRole('dialog', { hidden: true }).map((dialog) => dialog.getAttribute('aria-labelledby')))
+      .toEqual(['photos-title'])
+    expect(screen.queryByText('Nouvelle variante')).not.toBeInTheDocument()
+  })
+
   it('sends the photos it accepts, and says why it kept the others', async () => {
     const api = fakeApi(uploads(), ...references)
     const dialog = await openPhotos()
