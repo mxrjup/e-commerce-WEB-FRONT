@@ -1,0 +1,113 @@
+# Deploiement du back-office en production.
+#
+#   tag vX.Y.Z pousse sur main : le workflow Images publie l'image de la version ;
+#     quand il reussit, ce workflow la deploie.
+#   lancement manuel avec une version : la deploie (rollback ou redeploiement).
+#
+# A configurer une fois : l'environnement GitHub « production » avec le secret
+# KUBECONFIG (le kubeconfig du namespace), et le Deployment web-backoffice sur le
+# cluster (k8s/services/web-backoffice.yaml de e-commerce-INFRA).
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [Images]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version a deployer, un tag existant sur main (vX.Y.Z)"
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  deploy:
+    name: Deployer ${{ inputs.version || github.event.workflow_run.head_branch }}
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       startsWith(github.event.workflow_run.head_branch, 'v'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      VERSION: ${{ inputs.version || github.event.workflow_run.head_branch }}
+      DEPLOYMENT: web-backoffice
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verifier la version
+        run: |
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::Version invalide : $VERSION" ; exit 1
+          fi
+          if ! git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; then
+            echo "::error::Le tag $VERSION n'existe pas." ; exit 1
+          fi
+          # Les tags ne se posent que sur main (CLAUDE.md).
+          if ! git merge-base --is-ancestor "refs/tags/$VERSION" origin/main; then
+            echo "::error::Le tag $VERSION n'est pas sur main." ; exit 1
+          fi
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Digest de l'image
+        env:
+          REPOSITORY: ${{ github.repository }}
+        # Deployee par digest, pas par un tag qui pourrait bouger.
+        run: |
+          image="ghcr.io/${REPOSITORY,,}:${VERSION#v}"
+          digest=$(docker buildx imagetools inspect "$image" --format '{{json .Manifest}}' | jq -r .digest)
+          if [[ -z "$digest" || "$digest" == null ]]; then
+            echo "::error::Image absente : $image" ; exit 1
+          fi
+          echo "IMAGE=$image@$digest" >> "$GITHUB_ENV"
+
+      - name: Acces au cluster
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
+        run: |
+          if [[ -z "$KUBECONFIG_CONTENT" ]]; then
+            echo "::error::Secret KUBECONFIG absent de l'environnement production." ; exit 1
+          fi
+          install -m 600 /dev/null "$RUNNER_TEMP/kubeconfig"
+          printf '%s\n' "$KUBECONFIG_CONTENT" > "$RUNNER_TEMP/kubeconfig"
+          echo "KUBECONFIG=$RUNNER_TEMP/kubeconfig" >> "$GITHUB_ENV"
+
+      - name: Deployer
+        run: |
+          kubectl get deployment "$DEPLOYMENT" >/dev/null
+          kubectl set image deployment/"$DEPLOYMENT" "$DEPLOYMENT=$IMAGE"
+          kubectl annotate deployment/"$DEPLOYMENT" --overwrite kubernetes.io/change-cause="deploy $VERSION"
+          if ! kubectl rollout status deployment/"$DEPLOYMENT" --timeout=180s; then
+            echo "::error::Echec du deploiement de $VERSION : retour a la version precedente."
+            kubectl rollout undo deployment/"$DEPLOYMENT"
+            kubectl rollout status deployment/"$DEPLOYMENT" --timeout=180s || true
+            exit 1
+          fi
+
+      - name: Resume
+        if: always()
+        run: |
+          {
+            echo "### Deploiement de \`$VERSION\` : ${{ job.status }}"
+            echo '```'
+            kubectl get deployment "$DEPLOYMENT" -o custom-columns='SERVICE:.metadata.name,IMAGE:.spec.template.spec.containers[0].image,PRETS:.status.readyReplicas' 2>/dev/null || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          rm -f "$RUNNER_TEMP/kubeconfig"
