@@ -1,0 +1,81 @@
+# Image Docker du back-office sur GHCR, ghcr.io/<proprietaire>/e-commerce-web-front.
+#
+#   Pull Request        : construit l'image sans la pousser.
+#   push sur dev / main : construit et pousse, taggee par le SHA et la branche.
+#   tag vX.Y.Z          : idem, avec X.Y.Z, X.Y et latest ; puis le workflow
+#                         Deploy la met en production.
+name: Images
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: images-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: Images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    env:
+      PUSH: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Nom de l'image
+        env:
+          REPOSITORY: ${{ github.repository }}
+        # GHCR n'accepte que des noms en minuscules.
+        run: echo "IMAGE=ghcr.io/${REPOSITORY,,}" >> "$GITHUB_ENV"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Connexion a GHCR
+        if: env.PUSH == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+          flavor: |
+            latest=${{ startsWith(github.ref, 'refs/tags/v') }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ env.PUSH == 'true' }}
+          # Une PR charge l'image localement pour la verifier ci-dessous.
+          load: ${{ env.PUSH != 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Verifier la configuration nginx
+        if: env.PUSH != 'true'
+        env:
+          TAG: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        run: docker run --rm "$TAG" nginx -t
