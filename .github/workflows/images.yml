@@ -67,7 +67,15 @@ jobs:
         with:
           context: .
           push: ${{ env.PUSH == 'true' }}
+          # Une PR charge l'image localement pour la verifier ci-dessous.
+          load: ${{ env.PUSH != 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Verifier la configuration nginx
+        if: env.PUSH != 'true'
+        env:
+          TAG: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
+        run: docker run --rm "$TAG" nginx -t
